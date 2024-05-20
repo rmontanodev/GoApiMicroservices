@@ -1,10 +1,11 @@
 package test
 
 import (
-	"auction/user-service/internal/handler"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"user-service/internal/handler"
+	"user-service/internal/model"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
@@ -26,10 +27,10 @@ func TestCreateUser(t *testing.T) {
 	r := gin.Default()
 	userService := &MockUserService{}
 	userHandler := handler.NewUserHandler(userService)
-	r.POST("/users", userHandler.CreateUser)
+	r.POST("/users/create", userHandler.CreateUser)
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("POST", "/users", nil)
+	req, _ := http.NewRequest("POST", "/users/create", nil)
 	r.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusCreated, w.Code)

@@ -1,8 +1,8 @@
 package service
 
 import (
-	"auction/user-service/internal/model"
-	"auction/user-service/internal/repository"
+	"user-service/internal/model"
+	"user-service/internal/repository"
 )
 
 type UserService interface {
