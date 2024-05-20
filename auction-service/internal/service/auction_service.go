@@ -1,15 +1,15 @@
 package service
 
 import (
-	"auction/auction-service/internal/model"
-	"auction/auction-service/internal/repository"
+	"auction-service/internal/model"
+	"auction-service/internal/repository"
 
 	"github.com/streadway/amqp"
 )
 
 type AuctionService interface {
-	CreateAuction(item string, userID uint) error
-	GetAuctionByID(id uint) (*model.Auction, error)
+	CreateAuction(item string, userID uint) (model.Auction, error)
+	GetAuctionByID(id uint) (model.Auction, error)
 	PlaceBid(auctionID uint, bidAmount float64) error
 }
 
@@ -25,16 +25,16 @@ func NewAuctionService(auctionRepository repository.AuctionRepository, rabbitCon
 	}
 }
 
-func (s *auctionService) CreateAuction(item string, userID uint) error {
+func (s *auctionService) CreateAuction(item string, userID uint) (model.Auction, error) {
 	auction := &model.Auction{
 		Item:   item,
 		UserID: userID,
 	}
-	return s.auctionRepository.Create(auction)
+	return s.auctionRepository.CreateAuction(*auction)
 }
 
-func (s *auctionService) GetAuctionByID(id uint) (*model.Auction, error) {
-	return s.auctionRepository.GetByID(id)
+func (s *auctionService) GetAuctionByID(id uint) (model.Auction, error) {
+	return s.auctionRepository.GetAuctionByID(int(id))
 }
 
 func (s *auctionService) PlaceBid(auctionID uint, bidAmount float64) error {
