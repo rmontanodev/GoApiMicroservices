@@ -1,8 +1,8 @@
 package db
 
 import (
-	"TestGoApi/user-service/internal/config"
 	"log"
+	"user-service/internal/config"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
