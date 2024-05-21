@@ -108,7 +108,7 @@ func (uh *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	updatedUser.ID = uint(userID)
+	updatedUser.ID = int(userID)
 
 	if err := uh.repo.UpdateUser(updatedUser); err != nil {
 		log.Printf("Error updating user: %v", err)
