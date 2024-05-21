@@ -7,6 +7,7 @@ import (
 	"user-service/internal/handler"
 	"user-service/internal/model"
 	"user-service/internal/repository"
+	"user-service/rabbitmq"
 
 	_ "github.com/lib/pq"
 	"gorm.io/driver/postgres"
@@ -14,6 +15,8 @@ import (
 )
 
 func main() {
+	var publisher *rabbitmq.Publisher
+
 	cfg := config.LoadConfig() // Get DatabaseURL from config
 
 	// Database connection details (use value from config)
@@ -34,7 +37,7 @@ func main() {
 
 	handler.InitUserRepository(db)
 
-	userHandler := handler.NewUserHandler(&repository.UserRepositoryImpl{})
+	userHandler := handler.NewUserHandler(&repository.UserRepositoryImpl{}, publisher)
 	// Register HTTP endpoints with handler methods
 	http.HandleFunc("/users", userHandler.GetAllUsers)
 	http.HandleFunc("/users/{id}", userHandler.GetUserByID)

@@ -4,6 +4,7 @@ go 1.22.3
 
 require (
 	github.com/lib/pq v1.10.9
+	github.com/streadway/amqp v1.1.0
 	github.com/stretchr/testify v1.9.0
 	gorm.io/driver/postgres v1.5.7
 	gorm.io/gorm v1.25.10

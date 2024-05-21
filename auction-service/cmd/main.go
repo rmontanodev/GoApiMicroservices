@@ -4,6 +4,8 @@ import (
 	"auction-service/internal/config"
 	"auction-service/internal/handler"
 	"auction-service/internal/model"
+	"auction-service/internal/repository"
+	"auction-service/rabbitmq"
 	"log"
 	"net/http"
 
@@ -11,6 +13,11 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
+
+type RabbitMQConfig struct {
+	RabbitMQURL string `json:"rabbitmq_url"`
+	QueueName   string `json:"queue_name"`
+}
 
 func main() {
 	cfg := config.LoadConfig() // Get DatabaseURL from config
@@ -31,6 +38,14 @@ func main() {
 	}
 
 	log.Println("Migration successful")
+	repo := repository.NewAuctionRepository(db)
+
+	consumer, err := rabbitmq.NewConsumer(config.LoadConfig().RabbitMQURL, config.LoadConfig().QUEUE_USER_CREATED, repo)
+	if err != nil {
+		log.Fatalf("Failed to create RabbitMQ consumer: %v", err)
+	}
+
+	consumer.StartConsuming()
 
 	// Initialize auction repository with database connection
 	handler.InitAuctionRepository(db)

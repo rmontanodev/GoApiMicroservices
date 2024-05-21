@@ -6,22 +6,30 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
+	"user-service/internal/config"
 	"user-service/internal/model"
 	"user-service/internal/repository"
+	"user-service/rabbitmq"
 
 	"gorm.io/gorm"
 )
 
 type UserHandler struct {
-	repo repository.UserRepository
+	repo      repository.UserRepository
+	publisher *rabbitmq.Publisher
 }
 
-func NewUserHandler(repo repository.UserRepository) *UserHandler {
-	return &UserHandler{repo: repo}
+func NewUserHandler(repo repository.UserRepository, publisher *rabbitmq.Publisher) *UserHandler {
+	return &UserHandler{repo: repo, publisher: publisher}
 }
 
 func InitUserRepository(db *gorm.DB) repository.UserRepository {
 	return repository.NewUserRepositoryImpl(db)
+}
+
+type Config struct {
+	RabbitMQURL string `json:"rabbitmq_url"`
+	QueueName   string `json:"queue_name"`
 }
 
 // GetAllUsers handles the request to get all users.
@@ -85,6 +93,19 @@ func (uh *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(createdUser)
+
+	publisher, err := rabbitmq.NewPublisher(config.LoadConfig().RabbitMQURL, config.LoadConfig().QUEUE_USER_CREATED)
+	if err != nil {
+		log.Printf("Error creating RabbitMQ publisher: %v", err)
+		return
+	}
+
+	message := []byte("New user created: " + newUser.Name)
+	err = publisher.Publish(message)
+	if err != nil {
+		log.Printf("Error publishing message to RabbitMQ: %v", err)
+		return
+	}
 }
 
 // UpdateUser handles the request to update an existing user.

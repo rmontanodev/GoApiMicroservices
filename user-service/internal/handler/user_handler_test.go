@@ -44,7 +44,7 @@ func (m *MockUserRepository) DeleteUser(id int) error {
 
 func TestGetAllUsers(t *testing.T) {
 	mockRepo := new(MockUserRepository)
-	userHandler := handler.NewUserHandler(mockRepo)
+	userHandler := handler.NewUserHandler(mockRepo, nil)
 
 	users := []model.User{
 		{ID: 1, Name: "User 1", Email: "user1@example.com"},
@@ -75,7 +75,7 @@ func TestGetAllUsers(t *testing.T) {
 
 func TestGetUserByID(t *testing.T) {
 	mockRepo := new(MockUserRepository)
-	userHandler := handler.NewUserHandler(mockRepo)
+	userHandler := handler.NewUserHandler(mockRepo, nil)
 
 	user := model.User{Name: "User 1", Email: "user1@example.com"}
 
@@ -104,7 +104,7 @@ func TestGetUserByID(t *testing.T) {
 
 func TestCreateUser(t *testing.T) {
 	mockRepo := new(MockUserRepository)
-	userHandler := handler.NewUserHandler(mockRepo)
+	userHandler := handler.NewUserHandler(mockRepo, nil)
 
 	newUser := model.User{Name: "User 1", Email: "user1@example.com"}
 	createdUser := model.User{ID: 1, Name: "User 1", Email: "user1@example.com"}
@@ -140,7 +140,7 @@ func TestCreateUser(t *testing.T) {
 
 func TestUpdateUser(t *testing.T) {
 	mockRepo := new(MockUserRepository)
-	userHandler := handler.NewUserHandler(mockRepo)
+	userHandler := handler.NewUserHandler(mockRepo, nil)
 
 	updatedUser := model.User{ID: 1, Name: "User 1 Updated", Email: "user1updated@example.com"}
 
@@ -175,7 +175,7 @@ func TestUpdateUser(t *testing.T) {
 
 func TestDeleteUser(t *testing.T) {
 	mockRepo := new(MockUserRepository)
-	userHandler := handler.NewUserHandler(mockRepo)
+	userHandler := handler.NewUserHandler(mockRepo, nil)
 
 	mockRepo.On("DeleteUser", 1).Return(nil)
 

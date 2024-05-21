@@ -10,6 +10,8 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
+    networks:
+        - rabbitmq_network
 
   user-db:
     image: postgres:13
@@ -22,6 +24,8 @@ services:
       - "5432:5432"
     volumes:
       - user-db-data:/var/lib/postgresql/data
+    networks:
+      - rabbitmq_network
 
   auction-db:
     image: postgres:13
@@ -34,6 +38,8 @@ services:
       - "5433:5432"
     volumes:
       - auction-db-data:/var/lib/postgresql/data
+    networks:
+      - rabbitmq_network
 
   user-service:
     build: ./user-service
@@ -48,6 +54,8 @@ services:
     depends_on:
       - user-db
       - rabbitmq
+    networks:
+      - rabbitmq_network
 
   auction-service:
     build: ./auction-service
@@ -62,7 +70,13 @@ services:
     depends_on:
       - auction-db
       - rabbitmq
+    networks:
+      - rabbitmq_network
 
 volumes:
   user-db-data:
   auction-db-data:
+
+networks:
+  rabbitmq_network:
+    driver: bridge
