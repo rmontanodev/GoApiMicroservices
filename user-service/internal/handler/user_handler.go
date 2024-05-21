@@ -14,10 +14,10 @@ import (
 	"gorm.io/gorm"
 )
 
-var userRepository *repository.UserRepository
+var userRepository repository.UserRepository
 
 func InitUserRepository(db *gorm.DB) {
-	userRepository = repository.NewUserRepository(db)
+	userRepository = repository.NewUserRepositoryImpl(db)
 }
 
 // GetAllUsers handles the request to get all users.
