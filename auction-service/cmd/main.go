@@ -44,7 +44,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to create RabbitMQ consumer: %v", err)
 	}
-
+	log.Println("Connected to RabbitMQ")
 	consumer.StartConsuming()
 
 	// Initialize auction repository with database connection

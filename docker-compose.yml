@@ -60,6 +60,7 @@ services:
   auction-service:
     build: ./auction-service
     container_name: auction-service
+    restart: on-failure
     ports:
       - "8081:8081"
     environment:
@@ -67,6 +68,7 @@ services:
       DATABASE_URL: postgres://user:password@auction-db:5432/auctiondb?sslmode=disable
       RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
       GO111MODULE: on
+      RETRY_COUNT: 5
     depends_on:
       - auction-db
       - rabbitmq
