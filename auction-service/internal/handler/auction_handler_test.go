@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -83,7 +84,6 @@ func TestGetAuctionByID(t *testing.T) {
 	handler := http.HandlerFunc(auctionHandler.GetAuctionByID)
 	handler.ServeHTTP(rr, req)
 
-	// Imprimir el cuerpo de la respuesta para la depuración
 	t.Logf("Response body: %s", rr.Body.String())
 
 	assert.Equal(t, http.StatusOK, rr.Code)
@@ -116,7 +116,7 @@ func TestUpdateAuction(t *testing.T) {
 	}
 
 	reqBody, _ := json.Marshal(updatedAuction)
-	req, err := http.NewRequest("PUT", "/auctions/1", bytes.NewBuffer(reqBody))
+	req, err := http.NewRequest("PUT", "/auctions/update/1", bytes.NewBuffer(reqBody))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -167,26 +167,46 @@ func TestGetAllAuctions(t *testing.T) {
 func TestDeleteAuction(t *testing.T) {
 	mockRepo := new(MockAuctionRepository)
 	auction := model.Auction{ID: 1, Item: "Test Item", UserID: 1}
+
+	// Mock the CreateAuction method
 	mockRepo.On("CreateAuction", auction).Return(auction, nil)
-	mockRepo.On("DeleteAuction", auction).Return(nil)
 
 	auctionHandler := handler.NewAuctionHandler(mockRepo)
 
-	_, err := mockRepo.CreateAuction(auction)
+	// Step 1: Create an auction
+	auctionJSON, _ := json.Marshal(auction)
+	reqCreate, err := http.NewRequest("POST", "/auctions", bytes.NewBuffer(auctionJSON))
+	if err != nil {
+		t.Fatal(err)
+	}
+	reqCreate.Header.Set("Content-Type", "application/json")
+
+	rrCreate := httptest.NewRecorder()
+	createHandler := http.HandlerFunc(auctionHandler.CreateAuction)
+	createHandler.ServeHTTP(rrCreate, reqCreate)
+
+	assert.Equal(t, http.StatusCreated, rrCreate.Code)
+
+	var createdAuction model.Auction
+	err = json.NewDecoder(rrCreate.Body).Decode(&createdAuction)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	req, err := http.NewRequest("DELETE", "/auctions/1", nil)
+	// Mock the DeleteAuction method
+	mockRepo.On("DeleteAuction", createdAuction.ID).Return(nil)
+
+	// Step 2: Delete the created auction
+	reqDelete, err := http.NewRequest("DELETE", "/auctions/delete/"+strconv.Itoa(int(createdAuction.ID)), nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(auctionHandler.DeleteAuction)
-	handler.ServeHTTP(rr, req)
+	rrDelete := httptest.NewRecorder()
+	deleteHandler := http.HandlerFunc(auctionHandler.DeleteAuction)
+	deleteHandler.ServeHTTP(rrDelete, reqDelete)
 
-	assert.Equal(t, http.StatusNoContent, rr.Code)
+	assert.Equal(t, http.StatusNoContent, rrDelete.Code)
 
 	mockRepo.AssertExpectations(t)
 }

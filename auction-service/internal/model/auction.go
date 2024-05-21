@@ -7,15 +7,15 @@ import (
 )
 
 type Auction struct {
-	ID        uint `gorm:"primaryKey"`
+	ID        int `gorm:"primaryKey"`
 	Item      string
-	UserID    uint
+	UserID    int
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
 type User struct {
-	ID        uint   `gorm:"primaryKey"`
+	ID        int    `gorm:"primaryKey"`
 	Name      string `gorm:"size:255;not null"`
 	Email     string `gorm:"size:255;unique;not null"`
 	Password  string `gorm:"size:255;not null"`

@@ -29,8 +29,6 @@ func NewAuctionHandler(repo AuctionRepository) *AuctionHandler {
 	return &AuctionHandler{repo: repo}
 }
 
-var auctionRepository repository.AuctionRepository
-
 func InitAuctionRepository(db *gorm.DB) repository.AuctionRepository {
 	auctionRepository := repository.NewAuctionRepository(db)
 	return auctionRepository
@@ -112,7 +110,7 @@ func (h *AuctionHandler) UpdateAuction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	updatedAuction.ID = uint(auctionID)
+	updatedAuction.ID = int(auctionID)
 	if err := h.repo.UpdateAuction(updatedAuction); err != nil {
 		log.Printf("Error updating auction: %v", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)

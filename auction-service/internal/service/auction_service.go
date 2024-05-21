@@ -8,9 +8,9 @@ import (
 )
 
 type AuctionService interface {
-	CreateAuction(item string, userID uint) (model.Auction, error)
-	GetAuctionByID(id uint) (model.Auction, error)
-	PlaceBid(auctionID uint, bidAmount float64) error
+	CreateAuction(item string, userID int) (model.Auction, error)
+	GetAuctionByID(id int) (model.Auction, error)
+	PlaceBid(auctionID int, bidAmount float64) error
 }
 
 type auctionService struct {
@@ -25,7 +25,7 @@ func NewAuctionService(auctionRepository repository.AuctionRepository, rabbitCon
 	}
 }
 
-func (s *auctionService) CreateAuction(item string, userID uint) (model.Auction, error) {
+func (s *auctionService) CreateAuction(item string, userID int) (model.Auction, error) {
 	auction := &model.Auction{
 		Item:   item,
 		UserID: userID,
@@ -33,11 +33,11 @@ func (s *auctionService) CreateAuction(item string, userID uint) (model.Auction,
 	return s.auctionRepository.CreateAuction(*auction)
 }
 
-func (s *auctionService) GetAuctionByID(id uint) (model.Auction, error) {
+func (s *auctionService) GetAuctionByID(id int) (model.Auction, error) {
 	return s.auctionRepository.GetAuctionByID(int(id))
 }
 
-func (s *auctionService) PlaceBid(auctionID uint, bidAmount float64) error {
+func (s *auctionService) PlaceBid(auctionID int, bidAmount float64) error {
 	// Aquí es donde utilizarías RabbitMQ para enviar un mensaje
 	// al servicio de pujas para procesar la oferta.
 	return nil
